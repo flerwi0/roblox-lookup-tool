@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RobloxLookup.com - Free Roblox User Search & Profile Lookup Tool</title>
+    <title>Roblox-Lookup-Tool - Free Roblox User Search & Profile Finder</title>
     <meta name="description" content="Instantly search any Roblox user by username or ID. View avatars, stats, and profile info. 100% free, safe, and no login required!">
     <meta name="keywords" content="roblox lookup, roblox user search, roblox profile finder, roblox username search, roblox id lookup">
     <style>
@@ -463,7 +463,7 @@
             <div class="logo-container">
                 <div class="logo">
                     <span class="logo-icon">🎮</span>
-                    <span class="logo-text">RobloxLookup.com</span>
+                    <span class="logo-text">Roblox-Lookup-Tool</span>
                 </div>
             </div>
             <h1>The Ultimate Roblox User Search Tool</h1>
@@ -531,11 +531,8 @@
             showLoading();
             searchBtn.disabled = true;
 
-            // Show profile with direct image URLs (no API needed for images!)
-            setTimeout(() => {
-                displayProfile(parseInt(userId));
-                searchBtn.disabled = false;
-            }, 500);
+            // Call async display function
+            displayProfile(parseInt(userId));
         }
 
         function showLoading() {
@@ -557,17 +554,27 @@
         }
 
         function displayProfile(userId) {
-            // Use direct Roblox image URLs - these work without CORS!
-            const avatarUrl = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=420&height=420&format=png`;
-            const fullBodyUrl = `https://www.roblox.com/avatar-thumbnail/image?userId=${userId}&width=420&height=420&format=png`;
-            const bustUrl = `https://www.roblox.com/bust-thumbnail/image?userId=${userId}&width=420&height=420&format=png`;
+            // Use Roblox's working thumbnail endpoints
+            const avatarUrl = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
+            const fullBodyUrl = `https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
+            const bustUrl = `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userId}&size=150x150&format=Png&isCircular=false`;
+
+            // Fetch avatars properly
+            fetchAndDisplayProfile(userId, avatarUrl, bustUrl, fullBodyUrl);
+        }
+
+        async function fetchAndDisplayProfile(userId, avatarUrl, bustUrl, fullBodyUrl) {
+            // Use direct thumbnail API endpoints - let the browser handle loading
+            const headshot = `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
+            const bust = `https://www.roblox.com/bust-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
+            const fullbody = `https://www.roblox.com/avatar-thumbnail/image?userId=${userId}&width=150&height=150&format=png`;
 
             resultsDiv.innerHTML = `
                 <div class="profile-card">
                     <div class="profile-header">
                         <div class="avatar-section">
-                            <img id="mainAvatar" src="${fullBodyUrl}" alt="Avatar" class="main-avatar" 
-                                 onerror="this.src='https://via.placeholder.com/220/667eea/ffffff?text=User+${userId}'">
+                            <img id="mainAvatar" src="${fullbody}" alt="Avatar" class="main-avatar" 
+                                 onerror="this.src='https://via.placeholder.com/220/667eea/ffffff?text=Loading...'; setTimeout(() => this.src='${fullbody}', 2000);">
                         </div>
                         <div class="profile-info">
                             <div class="username">User ID: ${userId}</div>
@@ -595,17 +602,23 @@
                         <div class="info-title">📸 Avatar Images</div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
                             <div style="text-align: center;">
-                                <img src="${avatarUrl}" style="width: 100%; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" alt="Headshot">
+                                <img src="${headshot}" style="width: 100%; max-width: 150px; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: white;" alt="Headshot" 
+                                     onerror="this.src='https://via.placeholder.com/150/667eea/ffffff?text=Loading...'; setTimeout(() => this.src='${headshot}', 2000);">
                                 <div style="margin-top: 8px; color: #666; font-weight: 600;">Headshot</div>
                             </div>
                             <div style="text-align: center;">
-                                <img src="${bustUrl}" style="width: 100%; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" alt="Bust">
+                                <img src="${bust}" style="width: 100%; max-width: 150px; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: white;" alt="Bust" 
+                                     onerror="this.src='https://via.placeholder.com/150/667eea/ffffff?text=Loading...'; setTimeout(() => this.src='${bust}', 2000);">
                                 <div style="margin-top: 8px; color: #666; font-weight: 600;">Bust</div>
                             </div>
                             <div style="text-align: center;">
-                                <img src="${fullBodyUrl}" style="width: 100%; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" alt="Full Body">
+                                <img src="${fullbody}" style="width: 100%; max-width: 150px; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: white;" alt="Full Body" 
+                                     onerror="this.src='https://via.placeholder.com/150/667eea/ffffff?text=Loading...'; setTimeout(() => this.src='${fullbody}', 2000);">
                                 <div style="margin-top: 8px; color: #666; font-weight: 600;">Full Body</div>
                             </div>
+                        </div>
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 8px; font-size: 0.9em; color: #666;">
+                            💡 <strong>Tip:</strong> If images don't appear immediately, wait a few seconds for them to load from Roblox servers.
                         </div>
                     </div>
 
@@ -640,13 +653,15 @@
                     </div>
 
                     <div class="info-section">
-                        <div class="info-title">💡 Pro Tip</div>
+                        <div class="info-title">💡 Get Full User Info</div>
                         <div class="info-content">
-                            To get more detailed information (username, description, join date), click "👤 Full Profile" above to visit their official Roblox profile page!
+                            Click <strong>"👤 Full Profile"</strong> above to see their username, description, join date, and all other details on Roblox.com!
                         </div>
                     </div>
                 </div>
             `;
+            
+            searchBtn.disabled = false;
         }
 
         function copyToClipboard(text, label) {
